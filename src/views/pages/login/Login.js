@@ -1,6 +1,8 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { APP_URL } from '../../../config'
 import {
+  CAlert,
   CButton,
   CCard,
   CCardBody,
@@ -17,6 +19,44 @@ import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
 
 const Login = () => {
+  const [success, setSuccess] = useState(false)
+  const [failure, setFailure] = useState(false)
+  const [errMsg, setErrMsg] = useState({})
+  const navigate = useNavigate()
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    event.stopPropagation()
+    const data = new FormData(event.currentTarget)
+
+    fetch(APP_URL + '/users/login', {
+      method: 'POST',
+      headers: new Headers({
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      }),
+      body: JSON.stringify({
+        email: data.get('email'),
+        password: data.get('password'),
+      }),
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        if (res.error) {
+          setFailure(true)
+          setErrMsg(res.errMessage)
+        } else {
+          localStorage.setItem('token', res.data.token)
+          localStorage.setItem('user_id', res.data.id)
+          localStorage.setItem('user', JSON.stringify(res.data))
+          console.log('redirecting...')
+          window.location.href = '/'
+        }
+      })
+      .catch((e) => {
+        setFailure(true)
+        setErrMsg(e.errMessage)
+      })
+  }
   return (
     <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
       <CContainer>
@@ -25,28 +65,44 @@ const Login = () => {
             <CCardGroup>
               <CCard className="p-4">
                 <CCardBody>
-                  <CForm>
+                  <CForm onSubmit={handleSubmit}>
                     <h1>Login</h1>
                     <p className="text-medium-emphasis">Sign In to your account</p>
                     <CInputGroup className="mb-3">
                       <CInputGroupText>
                         <CIcon icon={cilUser} />
                       </CInputGroupText>
-                      <CFormInput placeholder="Username" autoComplete="username" />
+                      <CFormInput
+                        name="email"
+                        placeholder="Email"
+                        autoComplete="email"
+                        invalid={errMsg.hasOwnProperty('email') && failure}
+                        feedbackInvalid={errMsg.hasOwnProperty('email') && errMsg['email'].message}
+                      />
                     </CInputGroup>
                     <CInputGroup className="mb-4">
                       <CInputGroupText>
                         <CIcon icon={cilLockLocked} />
                       </CInputGroupText>
                       <CFormInput
+                        name="password"
                         type="password"
                         placeholder="Password"
-                        autoComplete="current-password"
+                        autoComplete="new-password"
+                        invalid={errMsg.hasOwnProperty('password') && failure}
+                        feedbackInvalid={
+                          errMsg.hasOwnProperty('password') && errMsg['password'].message
+                        }
                       />
                     </CInputGroup>
+                    <CRow className="mb-2">
+                      <CCol>
+                        {!(errMsg instanceof Object) && <CAlert color="danger">{errMsg}</CAlert>}
+                      </CCol>
+                    </CRow>
                     <CRow>
                       <CCol xs={6}>
-                        <CButton color="primary" className="px-4">
+                        <CButton color="primary" type="submit" className="px-4">
                           Login
                         </CButton>
                       </CCol>

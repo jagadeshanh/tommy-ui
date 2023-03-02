@@ -1,4 +1,10 @@
 import React from 'react'
+import CreateEntity from './views/entities/CreateEntity'
+import Entity from './views/entities/Entity'
+import FileUpload from './views/file-upload/FileUpload'
+import Profile from './views/profile/Profile'
+import CreateVendor from './views/vendors/CreateVendor'
+import Vendor from './views/vendors/Vendor'
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
@@ -95,6 +101,12 @@ const routes = [
   { path: '/notifications/modals', name: 'Modals', element: Modals },
   { path: '/notifications/toasts', name: 'Toasts', element: Toasts },
   { path: '/widgets', name: 'Widgets', element: Widgets },
+  { path: '/entities/all', name: 'Entities', element: Entity },
+  { path: '/entities/create', name: 'Entities', element: CreateEntity },
+  { path: '/file-upload', name: 'File Upload', element: FileUpload },
+  { path: '/vendors/all', name: 'Vendors', element: Vendor },
+  { path: '/vendors/create', name: 'Vendors', element: CreateVendor },
+  { path: '/profile', name: 'Profile', element: Profile },
 ]
 
 export default routes

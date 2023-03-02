@@ -23,7 +23,16 @@ const AppContent = () => {
               )
             )
           })}
-          <Route path="/" element={<Navigate to="dashboard" replace />} />
+          <Route
+            path="/"
+            element={
+              localStorage.getItem('token') ? (
+                <Navigate to="dashboard" replace />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
         </Routes>
       </Suspense>
     </CContainer>
